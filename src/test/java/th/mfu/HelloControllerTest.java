@@ -18,6 +18,24 @@ public class HelloControllerTest {
         // Act
         String response = controller.hello();
         // Assert
-        assertEquals("Hello World!", response);
+        assertEquals("Hello World", response);
+    }
+
+    @Test
+    public void testHi() {
+
+        // Act
+        String response = controller.hi("joon");
+        // Assert
+        assertEquals("Hello joon", response);
+    }
+
+    @Test
+    public void testSum() {
+
+        // Act
+        int response = controller.sum(5, 7);
+        // Assert
+        assertEquals(11, response);
     }
 }
