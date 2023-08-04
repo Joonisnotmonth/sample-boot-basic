@@ -4,6 +4,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,23 +25,37 @@ public class EmployeeController {
     @Autowired
     private EmployeeRepository employeeRepository;
 
-    // //select all employeee
-    // @GetMapping("/employees")
-    // public Collection<Employee> getAllEmployees(){
-    // return employeesDB.values();
-    // }
+    // select all employeee
+    @GetMapping("/employees")
+    public Collection<Employee> getAllEmployees() {
+        return employeeRepository.findAll();
+    }
 
-    // //select employee by id
-    // @GetMapping("/employees/{id}")
-    // public ResponseEntity getEmployeeById(@PathVariable long id){
-    // //check if id exists in db
-    // if(!employeesDB.containsKey(id)){
-    // //return error message 404
-    // return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Employee not
-    // found");
-    // }
-    // return ResponseEntity.ok(employeesDB.get(id));
-    // }
+    // select employee by id
+    @GetMapping("/employees/{id}")
+    public ResponseEntity getEmployeeById(@PathVariable long id) {
+        Optional<Employee> optEmployee = employeeRepository.findById(id);
+        // check if id exists in db
+        if (!optEmployee.isPresent()) {
+            // return error message 404
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Employee not found");
+        }
+        Employee emp = optEmployee.get();
+        return ResponseEntity.ok(emp);
+    }
+
+    // select employee by firstname
+    @GetMapping("/employees/firstname/{firstname}")
+    public ResponseEntity getEmployeeByFirstname(@PathVariable String firstname) {
+        // get employee from db
+        List<Employee> employees = employeeRepository.findByFirstnameStartingWith(firstname);
+        // check if employee is empty
+        if (employees.isEmpty()) {
+            // return error message 404
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Employee not found");
+        }
+        return ResponseEntity.ok(employees);
+    }
 
     // create new employee
     @PostMapping("/employees")
@@ -53,23 +69,21 @@ public class EmployeeController {
         return ResponseEntity.ok("Employee created");
     }
 
-    // //update employee
-    // @PutMapping("/employees/{id}")
-    // public ResponseEntity<String> updateEmployee(@PathVariable long id,
-    // @RequestBody Employee employee){
-    // //check if id not exists
-    // if(!employeesDB.containsKey(id)){
-    // //return error message
-    // return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Employee not
-    // found");
-    // }
+    // update employee
+    @PutMapping("/employees/")
+    public ResponseEntity<String> updateEmployee(@RequestBody Employee employee) {
+        // check if id not exists
+        if (!employeeRepository.existsById(employee.getId())) {
+            // return error message
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Employee not found");
+        }
 
-    // //update employee
-    // employeesDB.put(id, employee);
+        // update employee
+        employeeRepository.save(employee);
 
-    // //return success message
-    // return ResponseEntity.ok("Employee updated");
-    // }
+        // return success message
+        return ResponseEntity.ok("Employee updated");
+    }
 
     // //update employee with some fields using patch
     // @PatchMapping("/employees/{id}")
@@ -124,21 +138,20 @@ public class EmployeeController {
     // return ResponseEntity.ok("Employee updated");
     // }
 
-    // //delete employee
-    // @DeleteMapping("/employees/{id}")
-    // public ResponseEntity<String> deleteEmployee(@PathVariable long id){
-    // //check if id not exists
-    // if(!employeesDB.containsKey(id)){
-    // //return error message
-    // return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Employee not
-    // found");
-    // }
+    // delete employee
+    @DeleteMapping("/employees/{id}")
+    public ResponseEntity<String> deleteEmployee(@PathVariable long id) {
+        // check if id not exists
+        if (!employeeRepository.existsById(id)) {
+            // return error message
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Employee not found");
+        }
 
-    // //delete employee
-    // employeesDB.remove(id);
+        // delete employee
+        employeeRepository.deleteById(id);
 
-    // //return success message
-    // return ResponseEntity.ok("Employee deleted");
-    // }
+        // return success message
+        return ResponseEntity.ok("Employee deleted");
+    }
 
 }
