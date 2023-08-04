@@ -36,6 +36,6 @@ public class HelloControllerTest {
         // Act
         int response = controller.sum(5, 7);
         // Assert
-        assertEquals(11, response);
+        assertEquals(12, response);
     }
 }
